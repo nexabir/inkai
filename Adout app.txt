@@ -1,0 +1,24 @@
+I need a note taker app.
+
+In this note taker, there will be some note format options.
+1. Word like: Only text, photo, list, text format like bold, font size, text alignment etc.
+2. Excel like: Excel like input system, basics farmulas like sum, substraction, multiplication, division, average, if, ifs, sumif, sumifs, count, counta, countif, countifs etc.
+3. Design mode: This can be like Microsoft paint more or less.
+
+User can take note and any one format can be used by one page. A note can be different page long. User may use different format in different page.
+I need simple AI for grammar check in the note taker app. AI will help in the page. give suggestions of spelling.
+
+This app need to work on both mobile and laptop.
+This app will export instantly my note into Photo or pdf format. No sign in or sign out needed.
+
+
+1. I need two mood one dark and another is lite. Lite mood will be maroon, black and white. Dark mood will be glowing maroon, white. All elements need to be flotting and must be 3d.
+2. 15 formulas also need option tag cells in formulas like excel
+3. built-in is fine
+4. I need to export current or selected page or all pages.
+5. App Name: "InkAI" and made me a logo by AI
+
+
+In Excel Format, in formula if I secect a cell or a range, then automaticly cell refference added. The color is not good. Use another theme in dark mood which is famous. I also need a option always in top for changing dark ti lite.
+
+Excel need to automate. All options and everything need to be like excel or google sheet.

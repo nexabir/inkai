@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InkAI — Smart Note Taker</title>
+  <meta name="description" content="InkAI is a smart multi-format note-taking app with Word, Excel, and Design modes, AI grammar check, and export to PDF or PNG." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg viewBox="0 0 40 40" class="logo-svg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="lg" cx="40%" cy="30%" r="65%">
+                <stop offset="0%" stop-color="#ff4060"/>
+                <stop offset="100%" stop-color="#6b0000"/>
+              </radialGradient>
+              <filter id="glow"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <ellipse cx="20" cy="26" rx="11" ry="14" fill="url(#lg)" filter="url(#glow)"/>
+            <circle cx="20" cy="10" r="5" fill="url(#lg)" filter="url(#glow)"/>
+            <circle cx="13" cy="22" r="1.5" fill="rgba(255,255,255,0.7)"/>
+            <circle cx="20" cy="18" r="1.5" fill="rgba(255,255,255,0.7)"/>
+            <circle cx="27" cy="25" r="1.5" fill="rgba(255,255,255,0.7)"/>
+            <circle cx="16" cy="30" r="1.5" fill="rgba(255,255,255,0.7)"/>
+            <circle cx="24" cy="33" r="1.5" fill="rgba(255,255,255,0.7)"/>
+            <line x1="13" y1="22" x2="20" y2="18" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
+            <line x1="20" y1="18" x2="27" y2="25" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
+            <line x1="13" y1="22" x2="16" y2="30" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
+            <line x1="27" y1="25" x2="24" y2="33" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
+            <line x1="16" y1="30" x2="24" y2="33" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
+          </svg>
+          <span class="logo-text">InkAI</span>
+        </div>
+        <button id="sidebar-collapse" class="icon-btn" title="Collapse">
+          <i class="fa-solid fa-angles-left"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-actions">
+        <button id="new-notebook-btn" class="btn btn-primary full-width">
+          <i class="fa-solid fa-plus"></i> New Notebook
+        </button>
+      </div>
+
+      <div id="notebooks-list" class="notebooks-list"></div>
+
+      <div class="sidebar-footer">
+        <button id="theme-toggle" class="theme-toggle-btn">
+          <span class="theme-icon-wrap">
+            <i class="fa-solid fa-moon" id="theme-icon-dark"></i>
+            <i class="fa-solid fa-sun" id="theme-icon-light" style="display:none"></i>
+          </span>
+          <span id="theme-label">Dark Mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ═══════════════════ MAIN ═══════════════════ -->
+    <main id="main" class="main-area">
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobile-menu-btn" class="icon-btn mobile-only">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <button id="sidebar-open" class="icon-btn desktop-only" title="Open sidebar">
+            <i class="fa-solid fa-angles-right"></i>
+          </button>
+          <nav class="breadcrumb" id="breadcrumb">
+            <span class="bc-note">InkAI</span>
+          </nav>
+        </div>
+        <div class="topbar-right">
+          <!-- Always-visible theme toggle pill -->
+          <div class="theme-pill-btn" id="topbar-theme-btn" title="Toggle Theme">
+            <i class="fa-solid fa-moon tp-icon tp-icon-moon" id="tp-moon"></i>
+            <div class="theme-pill-track">
+              <div class="theme-pill-thumb" id="theme-pill-thumb"></div>
+            </div>
+            <i class="fa-solid fa-sun tp-icon tp-icon-sun" id="tp-sun"></i>
+            <span class="theme-pill-label" id="tp-label">Dark</span>
+          </div>
+          <button id="export-btn" class="btn btn-export" title="Export">
+            <i class="fa-solid fa-file-export"></i>
+            <span>Export</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Word Toolbar -->
+      <div id="word-toolbar" class="editor-toolbar word-toolbar hidden">
+        <div class="toolbar-group">
+          <select id="font-family" class="tb-select" title="Font">
+            <option value="Inter">Inter</option>
+            <option value="Georgia">Georgia</option>
+            <option value="'Courier New'">Courier</option>
+            <option value="Arial">Arial</option>
+            <option value="'Times New Roman'">Times New Roman</option>
+          </select>
+          <select id="font-size" class="tb-select narrow" title="Size">
+            <option value="1">10</option>
+            <option value="2">13</option>
+            <option value="3" selected>16</option>
+            <option value="4">18</option>
+            <option value="5">24</option>
+            <option value="6">32</option>
+            <option value="7">48</option>
+          </select>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <button class="tb-btn" id="tb-bold" data-cmd="bold" title="Bold"><b>B</b></button>
+          <button class="tb-btn" id="tb-italic" data-cmd="italic" title="Italic"><i>I</i></button>
+          <button class="tb-btn" id="tb-underline" data-cmd="underline" title="Underline"><u>U</u></button>
+          <button class="tb-btn" id="tb-strike" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <button class="tb-btn" data-cmd="justifyLeft" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
+          <button class="tb-btn" data-cmd="justifyCenter" title="Center"><i class="fa-solid fa-align-center"></i></button>
+          <button class="tb-btn" data-cmd="justifyRight" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
+          <button class="tb-btn" data-cmd="justifyFull" title="Justify"><i class="fa-solid fa-align-justify"></i></button>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <button class="tb-btn" data-cmd="insertUnorderedList" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
+          <button class="tb-btn" data-cmd="insertOrderedList" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
+          <button class="tb-btn" data-cmd="indent" title="Indent"><i class="fa-solid fa-indent"></i></button>
+          <button class="tb-btn" data-cmd="outdent" title="Outdent"><i class="fa-solid fa-outdent"></i></button>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <label class="tb-color-wrap" title="Text Color">
+            <i class="fa-solid fa-font"></i>
+            <input type="color" id="text-color" value="#ffffff" class="tb-color" />
+          </label>
+          <label class="tb-color-wrap" title="Highlight">
+            <i class="fa-solid fa-highlighter"></i>
+            <input type="color" id="bg-color" value="#8B0000" class="tb-color" />
+          </label>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <button class="tb-btn" id="tb-img" title="Insert Image"><i class="fa-solid fa-image"></i></button>
+          <button class="tb-btn" data-cmd="createLink" title="Insert Link"><i class="fa-solid fa-link"></i></button>
+          <button class="tb-btn" data-cmd="removeFormat" title="Clear Formatting"><i class="fa-solid fa-eraser"></i></button>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <button class="tb-btn" id="tb-ai-check" title="AI Grammar Check">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> AI
+          </button>
+        </div>
+        <input type="file" id="img-upload" accept="image/*" style="display:none" />
+      </div>
+
+      <!-- Excel Toolbar — Full Excel/Sheets style -->
+      <div id="excel-toolbar" class="editor-toolbar excel-toolbar hidden">
+        <!-- Row 1: Name Box + Formula Bar -->
+        <div class="xl-fbar-row">
+          <input id="name-box" class="name-box" placeholder="A1" title="Cell reference or named range" />
+          <span class="fx-label">fx</span>
+          <input id="formula-bar" class="formula-bar-input" placeholder="Enter a value or =formula…" autocomplete="off" />
+          <div id="xl-autocomplete" class="xl-autocomplete hidden"></div>
+        </div>
+        <!-- Row 2: Formatting toolbar -->
+        <div class="xl-fmt-row">
+          <div class="toolbar-group">
+            <select id="xl-font" class="tb-select xl-font-sel" title="Font Family">
+              <option value="">Default</option>
+              <option value="Inter">Inter</option>
+              <option value="Arial">Arial</option>
+              <option value="Calibri">Calibri</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Times New Roman">Times NR</option>
+              <option value="Verdana">Verdana</option>
+            </select>
+            <input type="number" id="xl-fsize" class="xl-fsize-inp" value="11" min="6" max="96" title="Font Size" />
+          </div>
+          <div class="toolbar-sep"></div>
+          <div class="toolbar-group">
+            <button class="tb-btn xl-fmt" id="xl-bold" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button class="tb-btn xl-fmt" id="xl-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button class="tb-btn xl-fmt" id="xl-underline" title="Underline (Ctrl+U)"><u>U</u></button>
+            <button class="tb-btn xl-fmt" id="xl-strike" title="Strikethrough"><s>S</s></button>
+          </div>
+          <div class="toolbar-sep"></div>
+          <div class="toolbar-group">
+            <label class="tb-color-wrap" title="Text Color">
+              <span class="xl-color-a">A</span>
+              <input type="color" id="xl-txt-color" class="tb-color" value="#c0caf5" />
+            </label>
+            <label class="tb-color-wrap" title="Fill Color (background)">
+              <i class="fa-solid fa-fill-drip" style="font-size:0.7rem"></i>
+              <input type="color" id="xl-fill-color" class="tb-color" value="#292e42" />
+            </label>
+          </div>
+          <div class="toolbar-sep"></div>
+          <div class="toolbar-group">
+            <button class="tb-btn xl-fmt" id="xl-al-left"   title="Align Left"><i class="fa-solid fa-align-left"></i></button>
+            <button class="tb-btn xl-fmt" id="xl-al-center" title="Center"><i class="fa-solid fa-align-center"></i></button>
+            <button class="tb-btn xl-fmt" id="xl-al-right"  title="Align Right"><i class="fa-solid fa-align-right"></i></button>
+            <button class="tb-btn xl-fmt" id="xl-wrap" title="Wrap Text"><i class="fa-solid fa-text-width"></i></button>
+          </div>
+          <div class="toolbar-sep"></div>
+          <div class="toolbar-group">
+            <select id="xl-numfmt" class="tb-select" title="Number Format" style="width:94px">
+              <option value="general">General</option>
+              <option value="number">Number</option>
+              <option value="currency">$ Currency</option>
+              <option value="percent">% Percent</option>
+              <option value="integer">Integer</option>
+              <option value="date">Date</option>
+              <option value="text">Text</option>
+            </select>
+            <button class="tb-btn" id="xl-dec-more" title="Increase Decimals">.0+</button>
+            <button class="tb-btn" id="xl-dec-less" title="Decrease Decimals">.0-</button>
+          </div>
+          <div class="toolbar-sep"></div>
+          <div class="toolbar-group">
+            <button class="tb-btn" id="xl-undo" title="Undo (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i></button>
+            <button class="tb-btn" id="xl-redo" title="Redo (Ctrl+Y)"><i class="fa-solid fa-rotate-right"></i></button>
+          </div>
+          <div class="toolbar-sep"></div>
+          <div class="toolbar-group">
+            <button class="tb-btn" id="xl-sort-asc"  title="Sort Ascending"><i class="fa-solid fa-arrow-up-wide-short"></i></button>
+            <button class="tb-btn" id="xl-sort-desc" title="Sort Descending"><i class="fa-solid fa-arrow-down-wide-short"></i></button>
+          </div>
+          <div class="toolbar-sep"></div>
+          <div class="toolbar-group">
+            <button class="tb-btn" id="xl-ins-row"  title="Insert Row"><i class="fa-solid fa-plus"></i> Row</button>
+            <button class="tb-btn" id="xl-ins-col"  title="Insert Column"><i class="fa-solid fa-plus"></i> Col</button>
+            <button class="tb-btn danger" id="xl-del-row" title="Delete Row"><i class="fa-solid fa-minus"></i> Row</button>
+            <button class="tb-btn danger" id="xl-del-col" title="Delete Col"><i class="fa-solid fa-minus"></i> Col</button>
+          </div>
+          <div class="toolbar-sep"></div>
+          <div class="toolbar-group">
+            <select id="xl-formula-insert" class="tb-select" title="Insert Formula" style="width:108px">
+              <option value="">∑ Insert Fn</option>
+              <optgroup label="— Math —">
+                <option value="=SUM()">SUM</option>
+                <option value="=AVERAGE()">AVERAGE</option>
+                <option value="=COUNT()">COUNT</option>
+                <option value="=COUNTA()">COUNTA</option>
+                <option value="=MIN()">MIN</option>
+                <option value="=MAX()">MAX</option>
+                <option value="=ROUND(,)">ROUND</option>
+                <option value="=ABS()">ABS</option>
+                <option value="=SQRT()">SQRT</option>
+                <option value="=POWER(,)">POWER</option>
+                <option value="=MOD(,)">MOD</option>
+                <option value="=INT()">INT</option>
+                <option value="=LARGE(,)">LARGE</option>
+                <option value="=SMALL(,)">SMALL</option>
+                <option value="=RANK(,,)">RANK</option>
+                <option value="=RAND()">RAND</option>
+                <option value="=RANDBETWEEN(,)">RANDBETWEEN</option>
+              </optgroup>
+              <optgroup label="— Arithmetic —">
+                <option value="=SUBTRACT(,)">SUBTRACT</option>
+                <option value="=MULTIPLY(,)">MULTIPLY</option>
+                <option value="=DIVIDE(,)">DIVIDE</option>
+              </optgroup>
+              <optgroup label="— Logic —">
+                <option value="=IF(,,)">IF</option>
+                <option value="=IFS(,,)">IFS</option>
+                <option value="=AND(,)">AND</option>
+                <option value="=OR(,)">OR</option>
+                <option value="=NOT()">NOT</option>
+                <option value="=IFERROR(,)">IFERROR</option>
+                <option value="=ISBLANK()">ISBLANK</option>
+                <option value="=ISNUMBER()">ISNUMBER</option>
+                <option value="=ISTEXT()">ISTEXT</option>
+              </optgroup>
+              <optgroup label="— Conditional —">
+                <option value="=SUMIF(,,)">SUMIF</option>
+                <option value="=SUMIFS(,,,)">SUMIFS</option>
+                <option value="=COUNTIF(,)">COUNTIF</option>
+                <option value="=COUNTIFS(,,,)">COUNTIFS</option>
+              </optgroup>
+              <optgroup label="— Text —">
+                <option value="=LEN()">LEN</option>
+                <option value="=LEFT(,)">LEFT</option>
+                <option value="=RIGHT(,)">RIGHT</option>
+                <option value="=MID(,,)">MID</option>
+                <option value="=UPPER()">UPPER</option>
+                <option value="=LOWER()">LOWER</option>
+                <option value="=TRIM()">TRIM</option>
+                <option value="=PROPER()">PROPER</option>
+                <option value="=CONCATENATE(,)">CONCATENATE</option>
+                <option value="=TEXTJOIN(,,)">TEXTJOIN</option>
+                <option value="=SUBSTITUTE(,,)">SUBSTITUTE</option>
+                <option value="=TEXT(,)">TEXT</option>
+              </optgroup>
+              <optgroup label="— Date —">
+                <option value="=TODAY()">TODAY</option>
+                <option value="=NOW()">NOW</option>
+                <option value="=YEAR()">YEAR</option>
+                <option value="=MONTH()">MONTH</option>
+                <option value="=DAY()">DAY</option>
+                <option value="=DAYS(,)">DAYS</option>
+              </optgroup>
+              <optgroup label="— Lookup —">
+                <option value="=VLOOKUP(,,,)">VLOOKUP</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="toolbar-sep"></div>
+          <div class="toolbar-group">
+            <button class="tb-btn" id="xl-name-cell"     title="Name Cell/Range"><i class="fa-solid fa-tag"></i></button>
+            <button class="tb-btn" id="xl-dropdown-cell" title="Add Dropdown Options"><i class="fa-solid fa-list-check"></i></button>
+            <button class="tb-btn" id="xl-find-btn"      title="Find & Replace (Ctrl+F)"><i class="fa-solid fa-magnifying-glass"></i></button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Design Toolbar -->
+      <div id="design-toolbar" class="editor-toolbar design-toolbar hidden">
+        <div class="toolbar-group tools-group">
+          <button class="tb-btn tool-btn active" data-tool="pen" title="Pen"><i class="fa-solid fa-pen"></i></button>
+          <button class="tb-btn tool-btn" data-tool="brush" title="Brush"><i class="fa-solid fa-paintbrush"></i></button>
+          <button class="tb-btn tool-btn" data-tool="eraser" title="Eraser"><i class="fa-solid fa-eraser"></i></button>
+          <button class="tb-btn tool-btn" data-tool="fill" title="Fill"><i class="fa-solid fa-fill-drip"></i></button>
+          <button class="tb-btn tool-btn" data-tool="line" title="Line"><i class="fa-solid fa-minus"></i></button>
+          <button class="tb-btn tool-btn" data-tool="rect" title="Rectangle"><i class="fa-regular fa-square"></i></button>
+          <button class="tb-btn tool-btn" data-tool="circle" title="Circle"><i class="fa-regular fa-circle"></i></button>
+          <button class="tb-btn tool-btn" data-tool="text" title="Text"><i class="fa-solid fa-font"></i></button>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <label class="tb-label">Color</label>
+          <input type="color" id="design-color" value="#8B0000" class="tb-color large" />
+          <label class="tb-label">Size</label>
+          <input type="range" id="brush-size" min="1" max="50" value="5" class="tb-range" title="Brush size" />
+          <span id="brush-size-label" class="tb-label">5px</span>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <label class="tb-label">Fill</label>
+          <input type="color" id="fill-color" value="#ffffff" class="tb-color" />
+          <button class="tb-btn" id="fill-toggle" title="Toggle fill">⬜ Outline</button>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <button class="tb-btn" id="design-undo" title="Undo"><i class="fa-solid fa-rotate-left"></i></button>
+          <button class="tb-btn" id="design-redo" title="Redo"><i class="fa-solid fa-rotate-right"></i></button>
+          <button class="tb-btn danger" id="design-clear" title="Clear Canvas"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+
+      <!-- AI Bar -->
+      <div id="ai-bar" class="ai-bar hidden">
+        <i class="fa-solid fa-wand-magic-sparkles ai-bar-icon"></i>
+        <span id="ai-bar-msg">Checking grammar and spelling…</span>
+        <button id="ai-bar-close" class="icon-btn small"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Editor Area -->
+      <div id="editor-area" class="editor-area">
+        <div id="welcome-screen" class="welcome-screen">
+          <div class="welcome-logo-wrap">
+            <svg viewBox="0 0 80 80" class="welcome-logo-svg" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="wlg" cx="40%" cy="30%" r="65%">
+                  <stop offset="0%" stop-color="#ff4060"/>
+                  <stop offset="100%" stop-color="#6b0000"/>
+                </radialGradient>
+                <filter id="wglow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <ellipse cx="40" cy="52" rx="22" ry="28" fill="url(#wlg)" filter="url(#wglow)"/>
+              <circle cx="40" cy="20" r="10" fill="url(#wlg)" filter="url(#wglow)"/>
+              <circle cx="26" cy="44" r="3" fill="rgba(255,255,255,0.8)"/>
+              <circle cx="40" cy="36" r="3" fill="rgba(255,255,255,0.8)"/>
+              <circle cx="54" cy="50" r="3" fill="rgba(255,255,255,0.8)"/>
+              <circle cx="32" cy="60" r="3" fill="rgba(255,255,255,0.8)"/>
+              <circle cx="48" cy="66" r="3" fill="rgba(255,255,255,0.8)"/>
+              <line x1="26" y1="44" x2="40" y2="36" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+              <line x1="40" y1="36" x2="54" y2="50" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+              <line x1="26" y1="44" x2="32" y2="60" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+              <line x1="54" y1="50" x2="48" y2="66" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+              <line x1="32" y1="60" x2="48" y2="66" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <h1 class="welcome-title">InkAI</h1>
+          <p class="welcome-sub">Smart multi-format note taking powered by AI</p>
+          <div class="welcome-features">
+            <div class="wf-card"><i class="fa-solid fa-file-word"></i><span>Word Editor</span></div>
+            <div class="wf-card"><i class="fa-solid fa-table"></i><span>Spreadsheet</span></div>
+            <div class="wf-card"><i class="fa-solid fa-paint-brush"></i><span>Design Mode</span></div>
+            <div class="wf-card"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Grammar</span></div>
+          </div>
+          <button id="welcome-start-btn" class="btn btn-primary large">
+            <i class="fa-solid fa-plus"></i> Create Your First Notebook
+          </button>
+        </div>
+
+        <div id="word-editor" class="editor word-editor hidden">
+          <div id="word-content" class="word-content" contenteditable="true" spellcheck="true"></div>
+        </div>
+
+        <div id="excel-editor" class="editor excel-editor hidden">
+          <div id="excel-grid-wrap" class="excel-grid-wrap">
+            <div id="excel-grid" class="excel-grid"></div>
+          </div>
+        </div>
+
+        <div id="design-editor" class="editor design-editor hidden">
+          <div class="canvas-wrap" id="canvas-wrap">
+            <canvas id="design-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════ MODALS ═══════════════════ -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+
+    <!-- New Notebook -->
+    <div id="notebook-modal" class="modal hidden">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-book"></i> New Notebook</h3>
+        <button class="modal-close icon-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Notebook Name</label>
+        <input type="text" id="notebook-name-input" class="form-input" placeholder="My Notebook…" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost modal-cancel">Cancel</button>
+        <button id="create-notebook-confirm" class="btn btn-primary">Create Notebook</button>
+      </div>
+    </div>
+
+    <!-- New Page -->
+    <div id="page-modal" class="modal hidden">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-circle-plus"></i> New Page</h3>
+        <button class="modal-close icon-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Page Name</label>
+        <input type="text" id="page-name-input" class="form-input" placeholder="Page 1…" />
+        <label class="form-label">Editor Mode</label>
+        <div class="format-grid">
+          <button class="format-card active" data-format="word">
+            <i class="fa-solid fa-file-word"></i>
+            <strong>Word</strong>
+            <small>Rich text, images, lists</small>
+          </button>
+          <button class="format-card" data-format="excel">
+            <i class="fa-solid fa-table"></i>
+            <strong>Excel</strong>
+            <small>Spreadsheet & formulas</small>
+          </button>
+          <button class="format-card" data-format="design">
+            <i class="fa-solid fa-paint-brush"></i>
+            <strong>Design</strong>
+            <small>Canvas drawing</small>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost modal-cancel">Cancel</button>
+        <button id="create-page-confirm" class="btn btn-primary">Create Page</button>
+      </div>
+    </div>
+
+    <!-- Export -->
+    <div id="export-modal" class="modal hidden">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-export"></i> Export Notes</h3>
+        <button class="modal-close icon-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Pages to Export</label>
+        <div class="radio-group">
+          <label class="radio-card"><input type="radio" name="exp-scope" value="current" checked /><span>Current Page</span></label>
+          <label class="radio-card"><input type="radio" name="exp-scope" value="selected" /><span>Selected Pages</span></label>
+          <label class="radio-card"><input type="radio" name="exp-scope" value="all" /><span>All Pages</span></label>
+        </div>
+        <div id="page-checkboxes" class="page-checkboxes hidden"></div>
+        <label class="form-label">Export Format</label>
+        <div class="radio-group">
+          <label class="radio-card"><input type="radio" name="exp-fmt" value="pdf" checked /><span><i class="fa-solid fa-file-pdf"></i> PDF</span></label>
+          <label class="radio-card"><input type="radio" name="exp-fmt" value="png" /><span><i class="fa-solid fa-image"></i> PNG Image</span></label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost modal-cancel">Cancel</button>
+        <button id="do-export-btn" class="btn btn-primary"><i class="fa-solid fa-download"></i> Export</button>
+      </div>
+    </div>
+
+    <!-- Name Cell/Range -->
+    <div id="named-cell-modal" class="modal hidden">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-tag"></i> Name Cell / Range</h3>
+        <button class="modal-close icon-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Name (e.g. Revenue, TotalSales)</label>
+        <input type="text" id="cell-name-input" class="form-input" placeholder="MyRange" />
+        <label class="form-label">Cell/Range (e.g. A1 or A1:B5)</label>
+        <input type="text" id="cell-range-input" class="form-input" placeholder="A1:B5" />
+        <div id="named-ranges-list" class="named-ranges-list"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost modal-cancel">Cancel</button>
+        <button id="save-cell-name-btn" class="btn btn-primary">Save Name</button>
+      </div>
+    </div>
+
+    <!-- Dropdown Options -->
+    <div id="validation-modal" class="modal hidden">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-list-check"></i> Cell Dropdown Options</h3>
+        <button class="modal-close icon-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Options (one per line)</label>
+        <textarea id="validation-options-input" class="form-input" rows="7" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost modal-cancel">Cancel</button>
+        <button id="save-validation-btn" class="btn btn-primary">Save Options</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AI Suggestion Popover -->
+  <div id="ai-popover" class="ai-popover hidden">
+    <div class="ai-popover-header">
+      <i class="fa-solid fa-wand-magic-sparkles"></i> Suggestions
+    </div>
+    <div id="ai-suggestions-list" class="ai-suggestions-list"></div>
+  </div>
+
+  <!-- Context Menu (Excel right-click) -->
+  <div id="context-menu" class="context-menu hidden">
+    <button class="ctx-item" id="ctx-name"><i class="fa-solid fa-tag"></i> Name Cell/Range</button>
+    <button class="ctx-item" id="ctx-dropdown"><i class="fa-solid fa-list-check"></i> Add Dropdown Options</button>
+    <div class="ctx-sep"></div>
+    <button class="ctx-item" id="ctx-insert-row"><i class="fa-solid fa-plus"></i> Insert Row Below</button>
+    <button class="ctx-item" id="ctx-insert-col"><i class="fa-solid fa-plus"></i> Insert Column Right</button>
+    <div class="ctx-sep"></div>
+    <button class="ctx-item danger" id="ctx-clear"><i class="fa-solid fa-eraser"></i> Clear Cell</button>
+  </div>
+
+  <script src="js/ai.js"></script>
+  <script src="js/editor-word.js"></script>
+  <script src="js/editor-excel.js"></script>
+  <script src="js/editor-design.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
