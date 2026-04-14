@@ -4,8 +4,8 @@
   "description": "Smart multi-format note taking powered by AI",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#1a1b26",
-  "theme_color": "#ff4060",
+  "background_color": "#09090b",
+  "theme_color": "#8b0000",
   "orientation": "portrait-primary",
   "icons": [
     {
