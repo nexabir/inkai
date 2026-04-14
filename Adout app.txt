@@ -22,3 +22,11 @@ This app will export instantly my note into Photo or pdf format. No sign in or s
 In Excel Format, in formula if I secect a cell or a range, then automaticly cell refference added. The color is not good. Use another theme in dark mood which is famous. I also need a option always in top for changing dark ti lite.
 
 Excel need to automate. All options and everything need to be like excel or google sheet.
+
+
+To push in Git:
+"
+git add .
+git commit -m "Update app with new InkAI logo and Maroon theme"
+git push origin main
+"

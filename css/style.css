@@ -10,6 +10,7 @@
 :root {
   --accent: #ff4060;
   --accent-bright: #ff6b84;
+  --accent-grad: linear-gradient(135deg, #ff6b84, #ff4060, #b00020);
   --accent-glow: rgba(255,64,96,0.55);
   --accent-glow-lg: rgba(255,64,96,0.18);
 
@@ -52,6 +53,7 @@
 [data-theme="light"] {
   --accent: #8b0000;
   --accent-bright: #b00020;
+  --accent-grad: linear-gradient(135deg, #b00020, #8b0000);
   --accent-glow: rgba(139,0,0,0.25);
   --accent-glow-lg: rgba(139,0,0,0.08);
 
@@ -201,7 +203,7 @@ body {
   font-size: 1.4rem;
   font-weight: 800;
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, var(--accent-bright), #ff6080, var(--accent));
+  background: var(--accent-grad);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -712,7 +714,7 @@ body {
   font-family: var(--font-display);
   font-size: 3.2rem;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--accent-bright), #ff6080, var(--accent));
+  background: var(--accent-grad);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1217,7 +1219,7 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+  background: var(--accent-grad);
   color: #fff;
   border-color: var(--accent);
   box-shadow: 0 4px 15px var(--accent-glow), 0 1px 0 rgba(255,255,255,0.15) inset;

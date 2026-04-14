@@ -114,15 +114,18 @@ window.WordEditor = (() => {
     });
   }
 
-  function runAICheck() {
+  async function runAICheck() {
     if (!_content) return;
     const text = _content.innerText || '';
-    const issues = window.InkAI_Grammar.analyze(text);
-    const summary = window.InkAI_Grammar.getSummary(issues);
-
+    
     const bar = document.getElementById('ai-bar');
     const barMsg = document.getElementById('ai-bar-msg');
     bar.classList.remove('hidden');
+    barMsg.textContent = 'Checking grammar...';
+
+    const issues = await window.InkAI_Grammar.analyze(text);
+    const summary = window.InkAI_Grammar.getSummary(issues);
+
     barMsg.textContent = summary;
 
     // Show popover with suggestions
