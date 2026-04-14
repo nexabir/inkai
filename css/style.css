@@ -1,38 +1,38 @@
 /* ═══════════════════════════════════════════════════════
    InkAI — Design System
-   Dark: Tokyo Night + Glowing Maroon (famous dark theme)
-   Light: maroon, black, white
+   Dark: Black + Glowing Maroon
+   Light: White + Maroon
 ═══════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
-/* ── DARK THEME TOKENS (Tokyo Night) ── */
+/* ── DARK THEME TOKENS (Black + Glowing Maroon) ── */
 :root {
-  --accent: #cf0035;
-  --accent-bright: #ff2255;
-  --accent-glow: rgba(207,0,53,0.55);
-  --accent-glow-lg: rgba(207,0,53,0.22);
+  --accent: #ff4060;
+  --accent-bright: #ff6b84;
+  --accent-glow: rgba(255,64,96,0.55);
+  --accent-glow-lg: rgba(255,64,96,0.18);
 
-  /* Tokyo Night backgrounds */
-  --bg: #1a1b26;
-  --bg2: #24283b;
-  --bg3: #1f2335;
-  --bg4: #292e42;
-  --glass: rgba(26,27,38,0.88);
-  --glass-border: rgba(207,0,53,0.32);
+  /* Dark backgrounds */
+  --bg: #09090b;
+  --bg2: #141416;
+  --bg3: #1f1f22;
+  --bg4: #2b2b2e;
+  --glass: rgba(9,9,11,0.85);
+  --glass-border: rgba(255,64,96,0.3);
 
-  /* Tokyo Night foreground */
-  --txt: #c0caf5;
-  --txt2: #a9b1d6;
-  --txt3: #565f89;
+  /* Foreground */
+  --txt: #ffffff;
+  --txt2: #d1d1d6;
+  --txt3: #8e8e93;
 
-  --border: rgba(86,95,137,0.28);
-  --border-hover: rgba(207,0,53,0.6);
+  --border: rgba(255,64,96,0.25);
+  --border-hover: rgba(255,64,96,0.6);
 
   --shadow-sm: 0 2px 10px rgba(0,0,0,0.7);
-  --shadow-md: 0 6px 24px rgba(0,0,0,0.7), 0 0 0 1px rgba(86,95,137,0.2);
-  --shadow-lg: 0 16px 48px rgba(0,0,0,0.85), 0 0 50px rgba(207,0,53,0.12), 0 0 0 1px rgba(207,0,53,0.2);
-  --shadow-glow: 0 0 24px rgba(207,0,53,0.55), 0 0 70px rgba(207,0,53,0.15), 0 8px 32px rgba(0,0,0,0.85);
+  --shadow-md: 0 6px 24px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,64,96,0.1);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.85), 0 0 50px rgba(255,64,96,0.15), 0 0 0 1px rgba(255,64,96,0.2);
+  --shadow-glow: 0 0 24px rgba(255,64,96,0.55), 0 0 70px rgba(255,64,96,0.15), 0 8px 32px rgba(0,0,0,0.85);
 
   --radius: 14px;
   --radius-sm: 8px;
@@ -48,31 +48,31 @@
   --font-display: 'Outfit', 'Inter', sans-serif;
 }
 
-/* ── LIGHT THEME TOKENS (Maroon + Black + White) ── */
+/* ── LIGHT THEME TOKENS (White + Maroon) ── */
 [data-theme="light"] {
-  --accent: #8B0000;
+  --accent: #8b0000;
   --accent-bright: #b00020;
   --accent-glow: rgba(139,0,0,0.25);
   --accent-glow-lg: rgba(139,0,0,0.08);
 
-  --bg: #f5f0f2;
+  --bg: #f8f9fa;
   --bg2: #ffffff;
-  --bg3: #f8f4f6;
-  --bg4: #ede8ea;
-  --glass: rgba(255,255,255,0.88);
-  --glass-border: rgba(139,0,0,0.18);
+  --bg3: #f1f3f5;
+  --bg4: #e9ecef;
+  --glass: rgba(255,255,255,0.85);
+  --glass-border: rgba(139,0,0,0.15);
 
-  --txt: #120808;
-  --txt2: #4a2020;
-  --txt3: #9a6868;
+  --txt: #1c1e21;
+  --txt2: #495057;
+  --txt3: #868e96;
 
-  --border: rgba(139,0,0,0.14);
-  --border-hover: rgba(139,0,0,0.45);
+  --border: rgba(139,0,0,0.15);
+  --border-hover: rgba(139,0,0,0.4);
 
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
-  --shadow-md: 0 6px 24px rgba(0,0,0,0.11), 0 0 0 1px rgba(139,0,0,0.08);
-  --shadow-lg: 0 16px 48px rgba(0,0,0,0.13), 0 0 28px rgba(139,0,0,0.07), 0 0 0 1px rgba(139,0,0,0.1);
-  --shadow-glow: 0 0 16px rgba(139,0,0,0.25), 0 8px 32px rgba(0,0,0,0.1);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 8px 24px rgba(139,0,0,0.06), 0 0 0 1px rgba(139,0,0,0.05);
+  --shadow-lg: 0 16px 48px rgba(139,0,0,0.08), 0 0 0 1px rgba(139,0,0,0.1);
+  --shadow-glow: 0 0 20px rgba(139,0,0,0.2), 0 10px 40px rgba(139,0,0,0.1);
 }
 
 /* ── RESET ── */
@@ -188,9 +188,10 @@ body {
   gap: 10px;
 }
 
-.logo-svg {
-  width: 36px;
-  height: 36px;
+.logo-img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
   filter: drop-shadow(0 0 8px var(--accent-glow));
   animation: floatCard 5s ease-in-out infinite;
 }
@@ -701,9 +702,10 @@ body {
   margin-bottom: 20px;
   animation: floatCard 5s ease-in-out infinite;
 }
-.welcome-logo-svg {
-  width: 100px;
-  height: 100px;
+.welcome-logo-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
   filter: drop-shadow(0 0 20px var(--accent-glow));
 }
 .welcome-title {
